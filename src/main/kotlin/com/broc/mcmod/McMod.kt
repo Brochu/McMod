@@ -18,7 +18,7 @@ object McMod : ModInitializer {
 		// Proceed with mild caution.
 		logger.info("Hello Fabric world!")
 		logger.info("[START] Preparing the mod")
-		Registry.register(Registries.ITEM, Identifier("mcmod", "custom_item"), custom_item)
+		Registry.register(Registries.ITEM, Identifier("tutorial", "custom_item"), custom_item)
 		logger.info("[DONE] Mod is prepped")
 	}
 }
