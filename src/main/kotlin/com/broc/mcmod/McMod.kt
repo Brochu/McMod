@@ -15,6 +15,8 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
 
+import com.broc.mcmod.mixin.NewDayCallback
+
 object McMod : ModInitializer {
     private val logger = LoggerFactory.getLogger("mcmod")
 	private val my_item = Registry.register(
@@ -52,5 +54,16 @@ object McMod : ModInitializer {
 
 			return@reg ActionResult.PASS
 		}
+
+		//TODO: Look into why this doesn't work
+		//val evt = NewDayCallback.EVENT
+		//if (evt == null) {
+		//	logger.info("Could not find / use the NewDayCallback")
+		//}
+		//NewDayCallback.EVENT.register reg@{ world ->
+		//	val t = world.timeOfDay
+		//	logger.info("CALLING FROM SERVER WORLD MIXIN, current time of day = $t")
+		//	return@reg ActionResult.PASS
+		//}
 	}
 }
