@@ -1,6 +1,7 @@
 package com.broc.mcmod
 
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.registry.FuelRegistry
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registry
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
+import net.minecraft.util.ActionResult
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
 
@@ -41,5 +43,14 @@ object McMod : ModInitializer {
 			Identifier("tutorial", "test_group"),
 			group
 		)
+
+		AttackBlockCallback.EVENT.register reg@{ player, world, hand, pos, direction ->
+			val state = world.getBlockState(pos)
+			if (state.isToolRequired && !player.isSpectator && player.mainHandStack.isEmpty) {
+				player.damage(world.damageSources.magic(), 1.0f)
+			}
+
+			return@reg ActionResult.PASS
+		}
 	}
 }
