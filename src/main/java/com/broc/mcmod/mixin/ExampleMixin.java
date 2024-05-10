@@ -12,10 +12,10 @@ public class ExampleMixin {
 	@Inject(at = @At("HEAD"), method = "tickTime", cancellable = true)
 	private void tickTime(CallbackInfo ci) {
 		// This code is injected into the start of MinecraftServer.loadWorld()V
-		ActionResult res = NewDayCallback.EVENT.invoker().interact((ServerWorld)(Object)this);
+		//ActionResult res = NewDayCallback.EVENT.invoker().interact((ServerWorld)(Object)this);
 
-		if (res == ActionResult.FAIL) {
-			ci.cancel();
-		}
+		//if (res == ActionResult.FAIL) {
+		//	ci.cancel();
+		//}
 	}
 }
