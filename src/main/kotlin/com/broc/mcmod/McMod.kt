@@ -2,11 +2,13 @@ package com.broc.mcmod
 
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.block.AbstractBlock
 import net.minecraft.block.Block
+import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
 import net.minecraft.item.ItemStack
@@ -16,11 +18,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
-
-import com.broc.mcmod.mixin.NewDayCallback
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.fabricmc.fabric.impl.event.interaction.InteractionEventsRouter
-import net.minecraft.item.BlockItem
 
 object McMod : ModInitializer {
     private val logger = LoggerFactory.getLogger("mcmod")
@@ -73,23 +70,14 @@ object McMod : ModInitializer {
 
 		ServerTickEvents.END_SERVER_TICK.register reg@ { server_world ->
 			val props = server_world.saveProperties.mainWorldProperties
-			val world_count = server_world.worlds.count()
-			//logger.warn("[SERVER TICK] We have $world_count worlds, time: ${props.timeOfDay}")
-
 			if (props.timeOfDay % 1000 == 0L) {
 				logger.warn("[SERVER TICK] NEW HOUR! BING BONG! (${props.timeOfDay})")
+
+				for (w in server_world.worlds) {
+					val t = w.levelProperties.time
+					logger.warn("[WORLD] time = $t")
+				}
 			}
 		}
-
-		//TODO: Look into why this doesn't work
-		//val evt = NewDayCallback.EVENT
-		//if (evt == null) {
-		//	logger.info("Could not find / use the NewDayCallback")
-		//}
-		//NewDayCallback.EVENT.register reg@{ world ->
-		//	val t = world.timeOfDay
-		//	logger.info("CALLING FROM SERVER WORLD MIXIN, current time of day = $t")
-		//	return@reg ActionResult.PASS
-		//}
 	}
 }
