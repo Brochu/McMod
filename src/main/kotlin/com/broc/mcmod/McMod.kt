@@ -50,7 +50,7 @@ object McMod : ModInitializer {
 		val group = FabricItemGroup.builder()
 			.icon { ItemStack(my_item) }
 			.displayName(Text.translatable("itemGroup.tutorial.test_group"))
-			.entries { _, entries -> entries.add(my_item) }
+			.entries { _, entries -> entries.add(my_item); entries.add(shop_item) }
 			.build()
 
 		Registry.register(
