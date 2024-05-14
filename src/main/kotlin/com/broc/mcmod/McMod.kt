@@ -4,13 +4,13 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
+//import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.block.AbstractBlock
 import net.minecraft.block.Block
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
-import net.minecraft.item.ItemGroups
+//import net.minecraft.item.ItemGroups
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registry
 import net.minecraft.registry.Registries
@@ -59,7 +59,7 @@ object McMod : ModInitializer {
 			group
 		)
 
-		AttackBlockCallback.EVENT.register reg@{ player, world, hand, pos, direction ->
+		AttackBlockCallback.EVENT.register reg@{ player, world, _, pos, _ ->
 			val state = world.getBlockState(pos)
 			if (state.isToolRequired && !player.isSpectator && player.mainHandStack.isEmpty) {
 				player.damage(world.damageSources.magic(), 1.0f)
@@ -68,12 +68,12 @@ object McMod : ModInitializer {
 			return@reg ActionResult.PASS
 		}
 
-		ServerTickEvents.END_SERVER_TICK.register reg@ { server_world ->
-			val props = server_world.saveProperties.mainWorldProperties
+		ServerTickEvents.END_SERVER_TICK.register reg@ { sworld ->
+			val props = sworld.saveProperties.mainWorldProperties
 			if (props.timeOfDay % 1000 == 0L) {
 				logger.warn("[SERVER TICK] NEW HOUR! BING BONG! (${props.timeOfDay})")
 
-				for (w in server_world.worlds) {
+				for (w in sworld.worlds) {
 					val t = w.levelProperties.time
 					logger.warn("[WORLD] time = $t")
 				}
