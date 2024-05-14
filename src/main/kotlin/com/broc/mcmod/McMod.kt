@@ -30,7 +30,7 @@ object McMod : ModInitializer {
 	private val my_block = Registry.register(
 		Registries.BLOCK,
 		Identifier("tutorial", "shop_block"),
-		Block(AbstractBlock.Settings.create().strength(4.0f))
+		ShopBlock(AbstractBlock.Settings.create().strength(1.0f))
 	)
 	private val shop_item = Registry.register(
 		Registries.ITEM,
