@@ -31,24 +31,24 @@ class DailyShop {
     }
     val conf = ShopConfig()
 
-    @OptIn(ExperimentalSerializationApi::class)
     fun init() {
         logger.warn("Here's an empty config: $conf")
         //TODO: Read config from CONFIGPATH, testing with resource for now
-        val streamConf = this.javaClass.getResourceAsStream("/ShopConf.json")!!
-        val obj = Json.decodeFromStream<JsonObject>(streamConf)
+        //TODO: Make sure we deal with lifetimes well...
+        val json = this.javaClass.getResourceAsStream("/ShopConf.json")!!.reader().readText()
+        val obj = Json.decodeFromString<JsonObject>(json)
         logger.warn("Trying to decode default config: $obj")
+        logger.warn("We should be getting the config from $CONFIGPATH")
 
-        // Set config
-        conf.enabled = obj["enabled"]!!.jsonPrimitive.boolean
-        conf.rollHour = obj["rollHour"]!!.jsonPrimitive.int
-        conf.openHour = obj["openHour"]!!.jsonPrimitive.int
-        conf.closeHour = obj["closeHour"]!!.jsonPrimitive.int
-        conf.shopSize = obj["shopSize"]!!.jsonPrimitive.int
-        //TODO: Look into extra " with jsonPrimitive.toString()...
-        conf.itemPool = ArrayList(obj["itemPool"]!!.jsonArray.map { elem ->
-            elem.jsonPrimitive.toString()
-        })
+        // Set config with default if missing
+        conf.enabled = obj["enabled"]?.jsonPrimitive?.boolean ?: false
+        conf.rollHour = obj["rollHour"]?.jsonPrimitive?.int ?: 0
+        conf.openHour = obj["openHour"]?.jsonPrimitive?.int ?: 3
+        conf.closeHour = obj["closeHour"]?.jsonPrimitive?.int ?: 22
+        conf.shopSize = obj["shopSize"]?.jsonPrimitive?.int ?: 1
+        conf.itemPool = ArrayList(obj["itemPool"]?.jsonArray?.map { elem ->
+            elem.jsonPrimitive.content
+        } ?: listOf())
         logger.warn("DONE LOADING CONFIG")
     }
 }
