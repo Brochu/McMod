@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+
+  "rollHour": 1,
+  "openHour": 4,
+  "closeHour": 23,
+
+  "shopSize": 1,
+  "itemPool": [
+    "minecraft:string",
+    "minecraft:tnt",
+    "minecraft:diamond"
+  ]
+}
