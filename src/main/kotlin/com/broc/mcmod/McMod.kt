@@ -1,8 +1,9 @@
 package com.broc.mcmod
 
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 //import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.registry.FuelRegistry
@@ -21,6 +22,8 @@ import org.slf4j.LoggerFactory
 
 object McMod : ModInitializer {
     private val logger = LoggerFactory.getLogger("mcmod")
+	private val shop = DailyShop()
+
 	private val my_item = Registry.register(
 		Registries.ITEM,
 		Identifier("tutorial", "custom_item"),
@@ -69,6 +72,7 @@ object McMod : ModInitializer {
 		}
 
 		ServerTickEvents.END_SERVER_TICK.register reg@ { sworld ->
+			//TODO: Find a way to forward new hour event to DailyShop
 			val props = sworld.saveProperties.mainWorldProperties
 			if (props.timeOfDay % 1000 == 0L) {
 				logger.warn("[SERVER TICK] NEW HOUR! BING BONG! (${props.timeOfDay})")
@@ -78,6 +82,14 @@ object McMod : ModInitializer {
 					logger.warn("[WORLD] time = $t")
 				}
 			}
+		}
+
+		ServerLifecycleEvents.SERVER_STARTED.register reg@ { server ->
+			val playerCount = server.playerNames.size
+			// Should report 0 players since server just started
+			logger.warn("[SERVER STARTED] With $playerCount players")
+
+			shop.init()
 		}
 	}
 }
