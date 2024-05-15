@@ -1,14 +1,18 @@
 package com.broc.mcmod
 
-import kotlinx.serialization.ExperimentalSerializationApi
+import kotlin.io.path.exists
+import kotlin.io.path.readText
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.Json
-import net.fabricmc.loader.api.FabricLoader
-import org.slf4j.LoggerFactory
-import java.io.InputStreamReader
+import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
 
-val CONFIGPATH = Paths.get(FabricLoader.getInstance().configDir.toString(), "ShopConf.json")
+import net.fabricmc.loader.api.FabricLoader
+import org.slf4j.LoggerFactory
+
+const val CONFIGFILE = "ShopConf.json"
+val CONFIGPATH: Path = Paths.get(FabricLoader.getInstance().configDir.toString(), CONFIGFILE)
 /**
  *  Handles all server wide related shop logic
  *  Refreshes, picking orders, opening & closing shop and loading configuration
@@ -32,13 +36,17 @@ class DailyShop {
     val conf = ShopConfig()
 
     fun init() {
-        logger.warn("Here's an empty config: $conf")
-        //TODO: Read config from CONFIGPATH, testing with resource for now
-        //TODO: Make sure we deal with lifetimes well...
-        val json = this.javaClass.getResourceAsStream("/ShopConf.json")!!.reader().readText()
+        if (!CONFIGPATH.exists()) {
+            logger.warn("Could not find config file at $CONFIGPATH, creating default config")
+
+            val resFile = File(this.javaClass.getResource("/$CONFIGFILE")!!.path)
+            val confFile = File(CONFIGPATH.toString())
+            resFile.copyTo(confFile)
+        }
+
+        //TODO: Careful about reading the whole file at once, to change if file becomes too large
+        val json = CONFIGPATH.readText()
         val obj = Json.decodeFromString<JsonObject>(json)
-        logger.warn("Trying to decode default config: $obj")
-        logger.warn("We should be getting the config from $CONFIGPATH")
 
         // Set config with default if missing
         conf.enabled = obj["enabled"]?.jsonPrimitive?.boolean ?: false
@@ -49,6 +57,5 @@ class DailyShop {
         conf.itemPool = ArrayList(obj["itemPool"]?.jsonArray?.map { elem ->
             elem.jsonPrimitive.content
         } ?: listOf())
-        logger.warn("DONE LOADING CONFIG")
     }
 }
