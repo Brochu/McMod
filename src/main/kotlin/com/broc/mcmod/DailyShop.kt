@@ -9,6 +9,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.village.TradeOffer
+import net.minecraft.village.TradeOfferList
+import net.minecraft.village.TradeOffers
 import org.slf4j.LoggerFactory
 
 const val CONFIGFILE = "ShopConf.json"
@@ -23,7 +26,7 @@ class DailyShop {
      * Configuration object for the daily shop
      */
     class ShopConfig {
-        var enabled = false;
+        var enabled = false
 
         var rollHour = 0   // Between 0-23
         var openHour = 3   // Between 0-23
@@ -31,9 +34,10 @@ class DailyShop {
 
         //TODO: Add weight for the random picks
         var shopSize = 1
-        var itemPool = ArrayList<String>();
+        var itemPool = ArrayList<String>()
     }
-    val conf = ShopConfig()
+    private val conf = ShopConfig()
+    val offers: ArrayList<TradeOffer> = arrayListOf()
 
     fun init() {
         if (!CONFIGPATH.exists()) {
@@ -57,5 +61,8 @@ class DailyShop {
         conf.itemPool = ArrayList(obj["itemPool"]?.jsonArray?.map { elem ->
             elem.jsonPrimitive.content
         } ?: listOf())
+    }
+
+    fun rollOffers() {
     }
 }
