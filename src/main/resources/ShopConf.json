@@ -5,10 +5,21 @@
   "openHour": 4,
   "closeHour": 23,
 
-  "shopSize": 1,
-  "itemPool": [
-    "minecraft:string",
-    "minecraft:tnt",
-    "minecraft:diamond"
+  "categories": [
+    {
+      "size": 1,
+      "name": "Balls",
+      "items": ["cobblemon:poke_ball", "cobblemon:ultra_ball"]
+    },
+    {
+      "size": 2,
+      "name": "TMs",
+      "items": ["simpletms:tm_absorb", "simpletms:tm_spikes", "simpletms:tm_explosion"]
+    },
+    {
+      "size": 3,
+      "name": "Others",
+      "items": ["minecraft:dirt", "minecraft:tnt", "minecraft:apple", "minecraft:coal"]
+    }
   ]
 }

@@ -32,9 +32,12 @@ class DailyShop {
         var openHour = 3   // Between 0-23
         var closeHour = 22 // Between 0-23
 
-        //TODO: Add weight for the random picks
-        var shopSize = 1
-        var itemPool = ArrayList<String>()
+        class Category {
+            var size = 1
+            var name = ""
+            var items = ArrayList<String>()
+        }
+        var categories = ArrayList<Category>()
     }
     private val conf = ShopConfig()
     val offers: ArrayList<TradeOffer> = arrayListOf()
@@ -57,10 +60,19 @@ class DailyShop {
         conf.rollHour = obj["rollHour"]?.jsonPrimitive?.int ?: 0
         conf.openHour = obj["openHour"]?.jsonPrimitive?.int ?: 3
         conf.closeHour = obj["closeHour"]?.jsonPrimitive?.int ?: 22
-        conf.shopSize = obj["shopSize"]?.jsonPrimitive?.int ?: 1
-        conf.itemPool = ArrayList(obj["itemPool"]?.jsonArray?.map { elem ->
-            elem.jsonPrimitive.content
+        conf.categories = ArrayList(obj["categories"]?.jsonArray?.map { c ->
+            val catObj = c.jsonObject;
+            val cat  = ShopConfig.Category()
+            cat.size = catObj["size"]?.jsonPrimitive?.int ?: 1
+            //TODO: Better error handling?
+            cat.name = catObj["name"]?.jsonPrimitive?.content ?: "INVALID"
+            //TODO: 2 layers deep of ArrayList parsing is a bit cursed...
+            cat.items = ArrayList(catObj["items"]?.jsonArray?.map { i ->
+                i.jsonPrimitive.content
+            } ?: listOf())
+            cat
         } ?: listOf())
+        logger.warn("Done parsing config: $conf")
     }
 
     fun rollOffers() {
