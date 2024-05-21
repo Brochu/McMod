@@ -8,14 +8,14 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.village.TradeOffer
-import net.minecraft.village.TradeOfferList
-import net.minecraft.village.TradeOffers
 import org.slf4j.LoggerFactory
 
 const val CONFIGFILE = "ShopConf.json"
 val CONFIGPATH: Path = Paths.get(FabricLoader.getInstance().configDir.toString(), CONFIGFILE)
+
 /**
  *  Handles all server wide related shop logic
  *  Refreshes, picking orders, opening & closing shop and loading configuration
@@ -35,6 +35,7 @@ class DailyShop {
         class Category {
             var size = 1
             var name = ""
+            //TODO: We need more info per item, stack size, price, discount multiplier, weight
             var items = ArrayList<String>()
         }
         var categories = ArrayList<Category>()
@@ -55,13 +56,13 @@ class DailyShop {
         val json = CONFIGPATH.readText()
         val obj = Json.decodeFromString<JsonObject>(json)
 
-        // Set config with default if missing
+        // Set config, fill default if missing
         conf.enabled = obj["enabled"]?.jsonPrimitive?.boolean ?: false
         conf.rollHour = obj["rollHour"]?.jsonPrimitive?.int ?: 0
         conf.openHour = obj["openHour"]?.jsonPrimitive?.int ?: 3
         conf.closeHour = obj["closeHour"]?.jsonPrimitive?.int ?: 22
         conf.categories = ArrayList(obj["categories"]?.jsonArray?.map { c ->
-            val catObj = c.jsonObject;
+            val catObj = c.jsonObject
             val cat  = ShopConfig.Category()
             cat.size = catObj["size"]?.jsonPrimitive?.int ?: 1
             //TODO: Better error handling?
@@ -73,8 +74,27 @@ class DailyShop {
             cat
         } ?: listOf())
         logger.warn("Done parsing config: $conf")
+
+        // -------------------------------------
+        rollOffers()
+        ServerTickEvents.END_SERVER_TICK.register { sworld ->
+            val props = sworld.saveProperties.mainWorldProperties
+            if (props.timeOfDay % 1000 == 0L) {
+                val newHour = (props.timeOfDay / 1000) % 24
+                hourChanged(newHour.toInt())
+            }
+        }
     }
 
-    fun rollOffers() {
+    private fun rollOffers() {
+        logger.warn("[ROLL OFFERS]")
+        offers
+        //TODO: Get offers from all categories
+    }
+
+    private fun hourChanged(newHour: Int) {
+        logger.warn("[NEW HOUR] $newHour")
+        //TODO: Open/Close logic
+        //TODO: Offer reroll logic
     }
 }
