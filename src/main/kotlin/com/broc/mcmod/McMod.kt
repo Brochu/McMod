@@ -71,19 +71,6 @@ object McMod : ModInitializer {
 			return@reg ActionResult.PASS
 		}
 
-		ServerTickEvents.END_SERVER_TICK.register reg@ { sworld ->
-			//TODO: Find a way to forward new hour event to DailyShop
-			val props = sworld.saveProperties.mainWorldProperties
-			if (props.timeOfDay % 1000 == 0L) {
-				logger.warn("[SERVER TICK] NEW HOUR! BING BONG! (${props.timeOfDay})")
-
-				for (w in sworld.worlds) {
-					val t = w.levelProperties.time
-					logger.warn("[WORLD] time = $t")
-				}
-			}
-		}
-
 		ServerLifecycleEvents.SERVER_STARTED.register reg@ { server ->
 			val playerCount = server.playerNames.size
 			// Should report 0 players since server just started
