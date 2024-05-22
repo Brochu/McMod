@@ -79,7 +79,8 @@ class DailyShop {
         rollOffers()
         ServerTickEvents.END_SERVER_TICK.register { sworld ->
             val props = sworld.saveProperties.mainWorldProperties
-            if (props.timeOfDay % 1000 == 0L) {
+            //logger.warn("${props.timeOfDay}")
+            if ((props.timeOfDay - 1) % 1000 == 0L) { // Lil Hacky
                 val newHour = (props.timeOfDay / 1000) % 24
                 hourChanged(newHour.toInt())
             }
