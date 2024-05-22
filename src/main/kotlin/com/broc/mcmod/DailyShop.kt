@@ -10,6 +10,9 @@ import java.nio.file.Paths
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
+import net.minecraft.util.Identifier
 import net.minecraft.village.TradeOffer
 import org.slf4j.LoggerFactory
 
@@ -41,7 +44,7 @@ class DailyShop {
         var categories = ArrayList<Category>()
     }
     private val conf = ShopConfig()
-    var isOpen = false;
+    var isOpen = false
     val offers: ArrayList<TradeOffer> = arrayListOf()
 
     fun init(currentHour: Int) {
@@ -90,10 +93,28 @@ class DailyShop {
         }
     }
 
+    private fun hourChanged(newHour: Int) {
+        logger.warn("[NEW HOUR] $newHour")
+
+        if (newHour == conf.closeHour) {
+            isOpen = false
+            logger.warn("Shop is now CLOSED")
+        }
+        if (newHour == conf.openHour) {
+            isOpen = true
+            logger.warn("Shop is now OPEN")
+        }
+
+        //TODO: Offer reroll logic
+        if (newHour == conf.rollHour) {
+            rollOffers()
+        }
+    }
+
     private fun checkIsOpen(currentHour: Int): Boolean {
         var i = conf.openHour
         if (conf.openHour > conf.closeHour) {
-            i -= 24;
+            i -= 24
         }
 
         while (i < conf.closeHour) {
@@ -105,25 +126,25 @@ class DailyShop {
 
     private fun rollOffers() {
         logger.warn("[ROLL OFFERS]")
-        offers
+        val getId = { name: String ->
+            val sep = name.indexOf(':')
+            val dir = name.substring(0..<sep)
+            val item = name.substring(sep+1)
+
+            Identifier(dir, item)
+        }
+
         //TODO: Get offers from all categories
-    }
-
-    private fun hourChanged(newHour: Int) {
-        logger.warn("[NEW HOUR] $newHour")
-
-        if (newHour == conf.closeHour) {
-            isOpen = false;
-            logger.warn("Shop is now CLOSED")
-        }
-        if (newHour == conf.openHour) {
-            isOpen = true;
-            logger.warn("Shop is now OPEN")
-        }
-
-        //TODO: Offer reroll logic
-        if (newHour == conf.rollHour) {
-            rollOffers()
+        for (c in conf.categories) {
+            logger.warn("CATEGORY ${c.name}:")
+            for (i in c.items) {
+                val id = getId(i)
+                logger.warn("\titemId = $id")
+                val item = Registries.ITEM.get(id)
+                logger.warn("\titem = $item")
+                val stack = ItemStack(item, 1)
+                logger.warn("\tstack = $stack")
+            }
         }
     }
 }
