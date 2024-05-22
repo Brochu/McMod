@@ -72,11 +72,9 @@ object McMod : ModInitializer {
 		}
 
 		ServerLifecycleEvents.SERVER_STARTED.register reg@ { server ->
-			val playerCount = server.playerNames.size
-			// Should report 0 players since server just started
-			logger.warn("[SERVER STARTED] With $playerCount players")
-
-			shop.init()
+			val props = server.saveProperties.mainWorldProperties
+			val currentHour = (props.timeOfDay / 1000) % 24
+			shop.init(currentHour.toInt())
 		}
 	}
 }

@@ -43,7 +43,7 @@ class DailyShop {
     private val conf = ShopConfig()
     val offers: ArrayList<TradeOffer> = arrayListOf()
 
-    fun init() {
+    fun init(currentHour: Int) {
         if (!CONFIGPATH.exists()) {
             logger.warn("Could not find config file at $CONFIGPATH, creating default config")
 
@@ -75,6 +75,7 @@ class DailyShop {
         } ?: listOf())
         logger.warn("Done parsing config: $conf")
 
+        if (!conf.enabled) { return }
         // -------------------------------------
         rollOffers()
         ServerTickEvents.END_SERVER_TICK.register { sworld ->
@@ -95,7 +96,16 @@ class DailyShop {
 
     private fun hourChanged(newHour: Int) {
         logger.warn("[NEW HOUR] $newHour")
+
         //TODO: Open/Close logic
+        if (newHour == conf.closeHour) {
+        }
+        if (newHour == conf.openHour) {
+        }
+
         //TODO: Offer reroll logic
+        if (newHour == conf.rollHour) {
+            rollOffers()
+        }
     }
 }
