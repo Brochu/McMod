@@ -41,6 +41,7 @@ class DailyShop {
         var categories = ArrayList<Category>()
     }
     private val conf = ShopConfig()
+    var isOpen = false;
     val offers: ArrayList<TradeOffer> = arrayListOf()
 
     fun init(currentHour: Int) {
@@ -77,15 +78,29 @@ class DailyShop {
 
         if (!conf.enabled) { return }
         // -------------------------------------
+        isOpen = checkIsOpen(currentHour)
+        logger.warn("Is the shop open? $isOpen")
         rollOffers()
         ServerTickEvents.END_SERVER_TICK.register { sworld ->
             val props = sworld.saveProperties.mainWorldProperties
-            //logger.warn("${props.timeOfDay}")
             if ((props.timeOfDay - 1) % 1000 == 0L) { // Lil Hacky
                 val newHour = (props.timeOfDay / 1000) % 24
                 hourChanged(newHour.toInt())
             }
         }
+    }
+
+    private fun checkIsOpen(currentHour: Int): Boolean {
+        var i = conf.openHour
+        if (conf.openHour > conf.closeHour) {
+            i -= 24;
+        }
+
+        while (i < conf.closeHour) {
+            if (i == currentHour) { return true }
+            i++
+        }
+        return false
     }
 
     private fun rollOffers() {
@@ -97,10 +112,13 @@ class DailyShop {
     private fun hourChanged(newHour: Int) {
         logger.warn("[NEW HOUR] $newHour")
 
-        //TODO: Open/Close logic
         if (newHour == conf.closeHour) {
+            isOpen = false;
+            logger.warn("Shop is now CLOSED")
         }
         if (newHour == conf.openHour) {
+            isOpen = true;
+            logger.warn("Shop is now OPEN")
         }
 
         //TODO: Offer reroll logic
