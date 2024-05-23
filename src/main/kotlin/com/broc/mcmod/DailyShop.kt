@@ -138,12 +138,12 @@ class DailyShop {
         for (c in conf.categories) {
             logger.warn("CATEGORY ${c.name}:")
             for (i in c.items) {
-                val id = getId(i)
-                logger.warn("\titemId = $id")
-                val item = Registries.ITEM.get(id)
-                logger.warn("\titem = $item")
-                val stack = ItemStack(item, 1)
-                logger.warn("\tstack = $stack")
+                val item = Registries.ITEM.getOrEmpty(getId(i))
+                if (!item.isEmpty) {
+                    val stack = ItemStack(item.get(), 1)
+                    logger.warn("\tstack = $stack")
+                    // Create offer
+                }
             }
         }
     }
