@@ -2,6 +2,7 @@ package com.broc.mcmod
 
 import kotlin.io.path.exists
 import kotlin.io.path.readText
+import kotlin.random.Random
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -127,6 +128,8 @@ class DailyShop {
 
     private fun rollOffers() {
         logger.warn("[ROLL OFFERS]")
+        offers.clear()
+
         val getId = { name: String ->
             val sep = name.indexOf(':')
             val dir = name.substring(0..<sep)
@@ -135,19 +138,23 @@ class DailyShop {
             Identifier(dir, item)
         }
 
-        //TODO: Get offers from all categories
         for (c in conf.categories) {
-            logger.warn("CATEGORY ${c.name}:")
-            for (i in c.items) {
-                val item = Registries.ITEM.getOrEmpty(getId(i))
-                val buy = Registries.ITEM.get(Identifier("minecraft", "emerald"))
-                if (!item.isEmpty) {
-                    val stack = ItemStack(item.get(), 1)
-                    val trade = ItemStack(buy, 1)
-                    logger.warn("\tstack = $stack")
+            logger.warn("CATEGORY ${c.name}, roll ${c.size} items:")
+            val chosen = HashSet<Int>()
+            for (i in 0..<c.size) {
+                var pick = Random.nextInt(0, c.items.size)
+                while (chosen.contains(pick)) {
+                    pick = Random.nextInt(0, c.items.size)
+                }
+                chosen.add(pick)
+
+                val soldItem = Registries.ITEM.getOrEmpty(getId(c.items[pick]))
+                //TODO: Config data for price
+                val buyItem = Registries.ITEM.get(Identifier("minecraft", "emerald"))
+                if (!soldItem.isEmpty) {
                     offers.add(TradeOffer(
-                        trade, ItemStack.EMPTY,
-                        stack,
+                        ItemStack(buyItem, 1), ItemStack.EMPTY,
+                        ItemStack(soldItem.get(), 1),
                         0, Int.MAX_VALUE, 0, 1.0f
                     ))
                 }
