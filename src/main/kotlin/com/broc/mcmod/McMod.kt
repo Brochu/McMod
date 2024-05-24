@@ -33,7 +33,7 @@ object McMod : ModInitializer {
 	private val my_block = Registry.register(
 		Registries.BLOCK,
 		Identifier("tutorial", "shop_block"),
-		ShopBlock(AbstractBlock.Settings.create().strength(1.0f))
+		ShopBlock(AbstractBlock.Settings.create().strength(1.0f), shop)
 	)
 	private val shop_item = Registry.register(
 		Registries.ITEM,
@@ -75,6 +75,7 @@ object McMod : ModInitializer {
 			val props = server.saveProperties.mainWorldProperties
 			val currentHour = (props.timeOfDay / 1000) % 24
 			shop.init(currentHour.toInt())
+			logger.warn("DailyShop initialize complete")
 		}
 	}
 }

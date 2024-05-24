@@ -15,7 +15,8 @@ import net.minecraft.village.TradeOffer
 import net.minecraft.village.TradeOfferList
 import net.minecraft.world.World
 
-class ShopBlock(settings: Settings) : Block(settings), Merchant {
+class ShopBlock(settings: Settings, shop: DailyShop) : Block(settings), Merchant {
+    private val shop = shop
 
     override fun onUse(
         state: BlockState?,
@@ -26,7 +27,12 @@ class ShopBlock(settings: Settings) : Block(settings), Merchant {
         hit: BlockHitResult?
     ): ActionResult {
         if (!world?.isClient!!) {
-            player?.sendMessage(Text.literal("Wanna shop?"), false)
+            if (shop.isOpen) {
+                player?.sendMessage(Text.literal("Wanna shop?"), false)
+            }
+            else {
+                player?.sendMessage(Text.literal("CLOSED!"), false)
+            }
         }
         return ActionResult.SUCCESS
     }
