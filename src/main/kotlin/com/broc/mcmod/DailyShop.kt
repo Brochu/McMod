@@ -146,9 +146,9 @@ class DailyShop {
                     val trade = ItemStack(buy, 1)
                     logger.warn("\tstack = $stack")
                     offers.add(TradeOffer(
+                        trade, ItemStack.EMPTY,
                         stack,
-                        trade,
-                        0, 0, 1.0f
+                        0, Int.MAX_VALUE, 0, 1.0f
                     ))
                 }
             }
