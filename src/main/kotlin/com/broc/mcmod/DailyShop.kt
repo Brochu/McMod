@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import net.minecraft.village.TradeOffer
+import net.minecraft.village.TradeOfferList
 import org.slf4j.LoggerFactory
 
 const val CONFIGFILE = "ShopConf.json"
@@ -45,7 +46,7 @@ class DailyShop {
     }
     private val conf = ShopConfig()
     var isOpen = false
-    val offers: ArrayList<TradeOffer> = arrayListOf()
+    val offers = TradeOfferList()
 
     fun init(currentHour: Int) {
         if (!CONFIGPATH.exists()) {
