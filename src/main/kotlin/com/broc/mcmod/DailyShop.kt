@@ -139,10 +139,16 @@ class DailyShop {
             logger.warn("CATEGORY ${c.name}:")
             for (i in c.items) {
                 val item = Registries.ITEM.getOrEmpty(getId(i))
+                val buy = Registries.ITEM.get(Identifier("minecraft", "emerald"))
                 if (!item.isEmpty) {
                     val stack = ItemStack(item.get(), 1)
+                    val trade = ItemStack(buy, 1)
                     logger.warn("\tstack = $stack")
-                    // Create offer
+                    offers.add(TradeOffer(
+                        stack,
+                        trade,
+                        0, 0, 1.0f
+                    ))
                 }
             }
         }
