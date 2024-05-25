@@ -57,6 +57,8 @@ class ShopBlock(settings: Settings, private val shop: DailyShop) : Block(setting
 
     override fun setOffersFromServer(offers: TradeOfferList?) {
         //Ignore, offers are rolled by DailyShop
+        //Will maybe need to handle this when multiple players are shopping at the same time
+        //Check screenHandler
     }
 
     override fun trade(offer: TradeOffer?) {
