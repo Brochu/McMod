@@ -5,10 +5,16 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
+import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
+import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
 //import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.block.AbstractBlock
 import net.minecraft.block.Block
+import net.minecraft.entity.EntityDimensions
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.SpawnGroup
+import net.minecraft.entity.mob.PathAwareEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 //import net.minecraft.item.ItemGroups
@@ -21,28 +27,42 @@ import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
 
 object McMod : ModInitializer {
+	private const val MODID = "tutorial"
+
     private val logger = LoggerFactory.getLogger("mcmod")
 	private val shop = DailyShop()
 
 	private val my_item = Registry.register(
 		Registries.ITEM,
-		Identifier("tutorial", "custom_item"),
+		Identifier(MODID, "custom_item"),
 		CustomItem(Item.Settings().maxCount(16))
 	)
 
 	private val my_block = Registry.register(
 		Registries.BLOCK,
-		Identifier("tutorial", "shop_block"),
+		Identifier(MODID, "shop_block"),
 		ShopBlock(AbstractBlock.Settings.create().strength(1.0f), shop)
 	)
 	private val shop_item = Registry.register(
 		Registries.ITEM,
-		Identifier("tutorial", "shop_item"),
+		Identifier(MODID, "shop_item"),
 		BlockItem(my_block, Item.Settings())
 	)
 
+	private val shop_type = EntityType.Builder.create(
+		{ type, world -> ShopEntity(type, world) },
+		SpawnGroup.CREATURE
+	)
+		.setDimensions(0.75f, 0.75f)
+		.build("PokeballBro")
+	private val shop_entity = Registry.register(
+		Registries.ENTITY_TYPE,
+		Identifier(MODID, "shop_entity"),
+		shop_type)
+
 	override fun onInitialize() {
 		FuelRegistry.INSTANCE.add(my_item, 300)
+		FabricDefaultAttributeRegistry.register(shop_entity, PathAwareEntity.createMobAttributes())
 
 		// Add to current Item Group
 		//ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register {
@@ -58,7 +78,7 @@ object McMod : ModInitializer {
 
 		Registry.register(
 			Registries.ITEM_GROUP,
-			Identifier("tutorial", "test_group"),
+			Identifier(MODID, "test_group"),
 			group
 		)
 
