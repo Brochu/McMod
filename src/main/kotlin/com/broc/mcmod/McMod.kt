@@ -38,6 +38,12 @@ object McMod : ModInitializer {
 		CustomItem(Item.Settings().maxCount(16))
 	)
 
+	private val wallet = Registry.register(
+		Registries.ITEM,
+		Identifier(MODID, "wallet"),
+		WalletItem(Item.Settings().maxCount(1))
+	)
+
 	private val my_block = Registry.register(
 		Registries.BLOCK,
 		Identifier(MODID, "shop_block"),
@@ -73,7 +79,11 @@ object McMod : ModInitializer {
 		val group = FabricItemGroup.builder()
 			.icon { ItemStack(my_item) }
 			.displayName(Text.translatable("itemGroup.tutorial.test_group"))
-			.entries { _, entries -> entries.add(my_item); entries.add(shop_item) }
+			.entries { _, entries ->
+				entries.add(my_item);
+				entries.add(shop_item);
+				entries.add(wallet)
+			}
 			.build()
 
 		Registry.register(
